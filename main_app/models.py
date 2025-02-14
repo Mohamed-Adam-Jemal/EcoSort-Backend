@@ -1,46 +1,57 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-class SmartBin(models.Model):
-    smartbin_id = models.AutoField(primary_key=True)
-    status = models.CharField(max_length=10)  # e.g., active, full, maintenance
-    location = models.CharField(max_length=20)  # GPS coordinates or address
-    capacity = models.IntegerField()  # Maximum capacity of the bin
-    fill_level = models.IntegerField()  # Current fill level (percentage or weight)
-    temperature = models.IntegerField()  # Temperature inside the bin
-    humidity = models.IntegerField()  # Humidity inside the bin
-
-    # Foreign Key to Trash (optional, if needed)
-    trash = models.ForeignKey('Trash', on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return f"SmartBin {self.smartbin_id} at {self.location}"
-    
-
-class Trash(models.Model):
-    trash_id = models.AutoField(primary_key=True)
-    trash_type = models.CharField(max_length=20)  # e.g., plastic, paper, metal, other
+class Waste(models.Model):
+    waste_id = models.AutoField(primary_key=True)
+    waste_type = models.CharField(max_length=20)  # e.g., plastic, paper, metal, other
     time_collected = models.DateTimeField(auto_now_add=True)  # Timestamp of collection
-    weight = models.FloatField()  # Weight of the trash (optional)
-    confidence_score = models.FloatField()  # Confidence score from YOLO classification (optional)
 
     # Foreign Key to TrashBot
-    trashbot = models.ForeignKey('TrashBot', on_delete=models.CASCADE)
+    wastebot = models.ForeignKey('WasteBot', on_delete=models.CASCADE)
+
+    # Foreign Key to SmartBin (one-to-many relationship)
+    smartbin = models.ForeignKey('SmartBin', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"Trash {self.trash_id} ({self.trash_type}) collected by TrashBot {self.trashbot.trashbot_id}"
-    
+        return f"Waste {self.trash_id} ({self.trash_type}) collected by WasteBot {self.trashbot.trashbot_id}"
 
 
-class TrashBot(models.Model):
-    trashbot_id = models.AutoField(primary_key=True)
-    status = models.CharField(max_length=10)  # e.g., active, idle, charging, maintenance
+class SmartBin(models.Model):
+
+    smartbin_id = models.AutoField(primary_key=True)
+    status = models.CharField(max_length=20)
+    location = models.CharField(max_length=20)
+    capacity = models.IntegerField()
+    fill_level = models.IntegerField()
+    temperature = models.IntegerField()
+    humidity = models.IntegerField()
+
+    def __str__(self):
+        return f"SmartBin {self.smartbin_id} - {self.status}"
+
+
+class WasteBot(models.Model):
+    wastebot_id = models.AutoField(primary_key=True)
+    status = models.CharField(max_length=20)  # e.g., active, idle, charging, maintenance
     location = models.CharField(max_length=20)  # GPS coordinates or address
-    battery_level = models.IntegerField()  # Battery level (percentage)
-    last_maintenance = models.DateTimeField()  # Timestamp of last maintenance
 
     # Foreign Key to User (optional, if TrashBot is assigned to a user)
-    #user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"TrashBot {self.trashbot_id} ({self.status})"
+        return f"WasteBot {self.trashbot_id} ({self.status})"
+    
+
+class User(models.Model):
+    user_id = models.AutoField(primary_key=True)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)  
+    email = models.EmailField(max_length=50)
+    username = models.CharField(max_length=20) 
+    password = models.CharField(max_length=30)
+    role = models.CharField(max_length=20, default='user')  
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"User {self.user_id}:({self.username})"
     
