@@ -20,6 +20,7 @@ class SmartBin(models.Model):
 
     id = models.AutoField(primary_key=True)
     status = models.CharField(max_length=20)
+    cover = models.CharField(max_length=20, default='Closed')  # Cover status (Open/Closed)
     location = models.CharField(max_length=20)
     capacity = models.IntegerField()
     fill_level = models.IntegerField(default=0)

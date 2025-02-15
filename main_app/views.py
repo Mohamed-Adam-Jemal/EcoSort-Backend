@@ -98,7 +98,7 @@ def smartbin_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT','PATCH', 'DELETE'])
 def smartbin_detail(request, pk):
     smartbin = get_object_or_404(SmartBin, pk=pk)
 
@@ -108,6 +108,13 @@ def smartbin_detail(request, pk):
 
     elif request.method == 'PUT':
         serializer = SmartBinSerializer(smartbin, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':
+        serializer = SmartBinSerializer(smartbin, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
