@@ -43,7 +43,6 @@ def user_detail(request, pk):
 
 # WasteBot views
 @api_view(['GET', 'POST'])
-@permission_classes([IsAdminOrReadOnly])
 def wastebot_list(request):
     if request.method == 'GET':
         wastebots = WasteBot.objects.all()
@@ -51,21 +50,13 @@ def wastebot_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        # Verify that the user is an admin
-        if not request.user.is_staff:
-            return Response(
-                {"detail": "Only admin users can add WasteBot."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
         serializer = WasteBotSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAdminOrReadOnly])
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def wastebot_detail(request, pk):
     wastebot = get_object_or_404(WasteBot, pk=pk)
 
@@ -74,14 +65,14 @@ def wastebot_detail(request, pk):
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        # Verify that the user is an admin
-        if not request.user.is_staff:
-            return Response(
-                {"detail": "Only admin users can update WasteBot."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
         serializer = WasteBotSerializer(wastebot, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':
+        serializer = WasteBotSerializer(wastebot, data=request.data, partial=True)  # Allow partial updates
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -89,15 +80,8 @@ def wastebot_detail(request, pk):
 
     elif request.method == 'DELETE':
         # Verify that the user is an admin
-        if not request.user.is_staff:
-            return Response(
-                {"detail": "Only admin users can delete WasteBot."},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
         wastebot.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
     
 # SmartBin views
 @api_view(['GET', 'POST'])

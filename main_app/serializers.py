@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import Waste, SmartBin, WasteBot
-from django.contrib.auth.models import User  # Import Django's built-in User model
+from .models import Waste, SmartBin, WasteBot, User
+#from django.contrib.auth.models import User  # Import Django's built-in User model
 
 # Serializer for the Trash model
 class WasteSerializer(serializers.ModelSerializer):
@@ -24,4 +24,14 @@ class WasteBotSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'email','username', 'password', 'date_joined' ]  # Serialize specific fields
+        fields = '__all__' 
+
+class wastebotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WasteBot
+        fields = '__all__' 
+
+class smartbinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SmartBin
+        fields = '__all__'  
