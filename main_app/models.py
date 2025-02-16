@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 class Waste(models.Model):
     id = models.AutoField(primary_key=True)
@@ -43,13 +43,13 @@ class WasteBot(models.Model):
 
 class User(models.Model):
     id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=20) 
-    email = models.EmailField(max_length=50)
-    password = models.CharField(max_length=30)
-    role = models.CharField(max_length=30, default='user')  
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
+    email = models.EmailField(max_length=50, unique=True)
+    password = models.CharField(max_length=128)  # Store hashed passwords
+    role = models.CharField(max_length=30, default="user")
     date_joined = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"User {self.user_id},({self.username} is a {self.role})"
-    
 
+    def __str__(self):
+        return f"User {self.id} is a {self.role})"

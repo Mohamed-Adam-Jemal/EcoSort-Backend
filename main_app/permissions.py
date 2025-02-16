@@ -1,9 +1,13 @@
-from rest_framework import permissions
+from rest_framework.permissions import BasePermission
 
-class IsAdminOrReadOnly(permissions.BasePermission):
+class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        # Allow read-only access to everyone
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        # Allow write access only to admin users
-        return request.user and request.user.is_staff
+        return request.user.role == 'admin'
+
+class IsAgent(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role == 'agent'
+
+class IsUser(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role == 'user'

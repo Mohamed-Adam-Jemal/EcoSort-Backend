@@ -1,14 +1,46 @@
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from .models import WasteBot, SmartBin, Waste, User
 from .serializers import WasteBotSerializer, SmartBinSerializer, WasteSerializer, UserSerializer
-from .permissions import IsAdminOrReadOnly
+from .decorators import role_required
+from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.tokens import RefreshToken
+
+@csrf_exempt
+@api_view(['POST'])
+def user_login(request):
+    email = request.data.get('email')
+    password = request.data.get('password')
+
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if user.password == password:
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
+        # Return user data and tokens
+        return Response({
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'access_token': access_token,
+            'refresh_token': str(refresh),
+        }, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 #User views
 @api_view(['GET', 'POST'])
+#@role_required(roles=['user', 'agent', 'admin']) 
 def user_list(request):
     if request.method == 'GET':
         users = User.objects.all()
@@ -140,3 +172,4 @@ def add_waste(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
