@@ -11,8 +11,6 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import make_password, check_password
 
-print(make_password('s12345'))
-print(check_password('s12345', 'pbkdf2_sha256$870000$S85SZF2oqes8Ud7o1YqAVI$50kANSnwzWaGXBgW6CctGttXYf5popkt4nFyUxUT3f8='))
 
 @csrf_exempt
 @api_view(['POST'])
@@ -40,7 +38,6 @@ def user_login(request):
 
 #User views
 @api_view(['GET', 'POST'])
-#@role_required(roles=['user', 'agent', 'admin']) 
 def user_list(request):
     if request.method == 'GET':
         users = User.objects.all()

@@ -1,6 +1,23 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 
+class User(models.Model):
+    id = models.AutoField(primary_key=True)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
+    email = models.EmailField(max_length=50, unique=True)
+    password = models.CharField(max_length=128)  # Store hashed passwords
+    role = models.CharField(max_length=30, default="user")
+    date_joined = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.id} | {self.first_name} {self.last_name} | {self.role}"
+
+    def save(self, *args, **kwargs):
+        # Hash the password before saving the model instance
+        if self.password and not self.password.startswith('pbkdf2_sha256$'):  # Check if the password is not already hashed
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 
 class Waste(models.Model):
     id = models.AutoField(primary_key=True)
@@ -42,16 +59,4 @@ class WasteBot(models.Model):
     def __str__(self):
         return f"WasteBot {self.id} - {self.model} ({self.status})"
 
-
-class User(models.Model):
-    id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
-    email = models.EmailField(max_length=50, unique=True)
-    password = models.CharField(max_length=128)  # Store hashed passwords
-    role = models.CharField(max_length=30, default="user")
-    date_joined = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self):
-        return f"{self.id} | {self.first_name} {self.last_name} | {self.role}"
 
