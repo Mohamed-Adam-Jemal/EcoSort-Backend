@@ -26,12 +26,7 @@ def user_login(request):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
-        # Return user data and tokens
         return Response({
-            'id': user.id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email,
             'access_token': access_token,
             'refresh_token': str(refresh),
         }, status=status.HTTP_200_OK)
