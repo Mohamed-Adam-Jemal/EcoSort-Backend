@@ -9,6 +9,10 @@ from .decorators import role_required
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.hashers import make_password, check_password
+
+print(make_password('s12345'))
+print(check_password('s12345', 'pbkdf2_sha256$870000$S85SZF2oqes8Ud7o1YqAVI$50kANSnwzWaGXBgW6CctGttXYf5popkt4nFyUxUT3f8='))
 
 @csrf_exempt
 @api_view(['POST'])
@@ -21,7 +25,8 @@ def user_login(request):
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    if user.password == password:
+    # Use the check_password method to verify the password
+    if check_password(password, user.password):
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)

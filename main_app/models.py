@@ -42,6 +42,7 @@ class WasteBot(models.Model):
     def __str__(self):
         return f"WasteBot {self.id} - {self.model} ({self.status})"
 
+
 class User(models.Model):
     id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=20)
@@ -50,12 +51,6 @@ class User(models.Model):
     password = models.CharField(max_length=128)  # Store hashed passwords
     role = models.CharField(max_length=30, default="user")
     date_joined = models.DateTimeField(auto_now_add=True)
-
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.password)
     
     def __str__(self):
-        return f"User {self.id} is a {self.role})"
+        return f"User {self.id} is a {self.role}"
