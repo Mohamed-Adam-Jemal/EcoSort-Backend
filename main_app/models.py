@@ -53,4 +53,5 @@ class User(models.Model):
     date_joined = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f"User {self.id} is a {self.role}"
+        return f"{self.id} | {self.first_name} {self.last_name} | {self.role}"
+
