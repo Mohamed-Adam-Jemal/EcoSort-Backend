@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 from django.conf import settings
 import threading
 import json
+from main_app.models import WasteBot, Waste, SmartBin
 
 # Callback when the client connects to the broker
 def on_connect(client, userdata, flags, rc):
@@ -21,17 +22,19 @@ def on_message(client, userdata, message):
         # Parse the JSON payload
         data = json.loads(message.payload)
 
-        # Example: Logging or saving the data
-        print("Parsed Data:", data)
+        # Retrieve the WasteBot instance using the wastebot_id
+        wastebot_instance = WasteBot.objects.get(id=data["wastebot_id"])
 
-        # If needed, you can save the data to the database or trigger any other action
-        # from main_app.models import Waste
-        # Waste.objects.create(
-        #     waste_type=data.get("detected_waste")[0].get("class"),
-        #     wastebot=data.get("wastebot_id"),
-        #     smartbin=15
-        # )
-        # print("Data saved to the database.")
+        # Retrieve the SmartBin instance using the smartbin_id
+        smartbin_instance = SmartBin.objects.get(id=1)
+
+        # Save to database
+        Waste.objects.create(
+            waste_type=data["detected_waste"][0]["class"],
+            wastebot=wastebot_instance,  # Use the actual instance of WasteBot
+            smartbin=smartbin_instance  # Use the actual instance of SmartBin
+        )
+        print("Data saved to the database.")
 
     except json.JSONDecodeError as e:
         print(f"Error decoding JSON: {e}")
