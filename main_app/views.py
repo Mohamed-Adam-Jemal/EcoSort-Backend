@@ -11,7 +11,6 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import make_password, check_password
 
-
 @csrf_exempt
 @api_view(['POST'])
 def user_login(request):
@@ -154,19 +153,45 @@ def smartbin_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
-#Waste views
+# List all Waste objects or create a new Waste
 @api_view(['GET', 'POST'])
-def add_waste(request):
+def waste_list(request):
     if request.method == 'GET':
         waste = Waste.objects.all()
         serializer = WasteSerializer(waste, many=True)
         return Response(serializer.data)
-    
+
     elif request.method == 'POST':
         serializer = WasteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
+
+# Retrieve, update, partial update or delete a single Waste object
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+def waste_detail(request, pk):
+    waste = get_object_or_404(Waste, pk=pk)
+
+    if request.method == 'GET':
+        serializer = WasteSerializer(waste)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = WasteSerializer(waste, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':
+        serializer = WasteSerializer(waste, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        waste.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

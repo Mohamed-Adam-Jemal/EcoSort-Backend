@@ -3,14 +3,24 @@ import paho.mqtt.client as mqtt
 from django.conf import settings
 import threading
 import json
-from main_app.models import WasteBot, Waste, SmartBin
+from main_app.models import WasteBot, SmartBin, Waste
+
+
+# To track if the client is already subscribed
+is_subscribed = False
 
 # Callback when the client connects to the broker
 def on_connect(client, userdata, flags, rc):
+    global is_subscribed
+
     if rc == 0:
         print("Connected to AWS IoT Core!")
-        client.subscribe(settings.MQTT_CONFIG["topic"])  # Subscribe to the topic
-        print(f"Subscribed to topic: {settings.MQTT_CONFIG['topic']}")
+
+        # Check if already subscribed to avoid double subscription
+        if not is_subscribed:
+            client.subscribe(settings.MQTT_CONFIG["topic"], qos=0)
+            is_subscribed = True
+            print(f"Subscribed to topic: {settings.MQTT_CONFIG['topic']}")
     else:
         print(f"Connection failed with code {rc}")
 
@@ -22,18 +32,13 @@ def on_message(client, userdata, message):
         # Parse the JSON payload
         data = json.loads(message.payload)
 
-        # Retrieve the WasteBot instance using the wastebot_id
+        # Retrieve instances from the database (synchronous ORM)
         wastebot_instance = WasteBot.objects.get(id=data["wastebot_id"])
-
-        # Retrieve the SmartBin instance using the smartbin_id
         smartbin_instance = SmartBin.objects.get(id=1)
 
-        # Save to database
-        Waste.objects.create(
-            waste_type=data["detected_waste"][0]["class"],
-            wastebot=wastebot_instance,  # Use the actual instance of WasteBot
-            smartbin=smartbin_instance  # Use the actual instance of SmartBin
-        )
+        # Save data to the database using async function
+        save_waste_data(wastebot_instance, smartbin_instance, data)
+
         print("Data saved to the database.")
 
     except json.JSONDecodeError as e:
@@ -41,9 +46,16 @@ def on_message(client, userdata, message):
     except Exception as e:
         print(f"Error processing message: {e}")
 
+def save_waste_data(wastebot_instance, smartbin_instance, data):
+    Waste.objects.create(
+        waste_type=data["detected_waste"][0]["class"],
+        wastebot=wastebot_instance,
+        smartbin=smartbin_instance
+    )
+
 # Configure and run the MQTT client
 def run_mqtt_client():
-    client = mqtt.Client()
+    client = mqtt.Client(userdata={"subscribed": False})  # Initialize userdata
     client.tls_set(
         ca_certs=settings.MQTT_CONFIG["root_ca_file"],
         certfile=settings.MQTT_CONFIG["cert_file"],
@@ -55,11 +67,17 @@ def run_mqtt_client():
     client.on_message = on_message
     client.connect(settings.MQTT_CONFIG["iot_endpoint"], settings.MQTT_CONFIG["port"])
 
-    # Start MQTT client loop in the background
+    # Start the MQTT client loop in the background
     client.loop_forever()
 
-# This method will be used to start the MQTT client in a background thread
+mqtt_thread = None
+
 def start_mqtt_in_thread():
-    mqtt_thread = threading.Thread(target=run_mqtt_client)
-    mqtt_thread.daemon = True  # Ensure the thread will exit when the main program exits
-    mqtt_thread.start()
+    global mqtt_thread
+    if mqtt_thread is None or not mqtt_thread.is_alive():
+        mqtt_thread = threading.Thread(target=run_mqtt_client)
+        mqtt_thread.daemon = True
+        mqtt_thread.start()
+        print("MQTT client started in background thread.")
+    else:
+        print("MQTT client is already running.")
