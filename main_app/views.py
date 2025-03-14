@@ -1,15 +1,16 @@
-from django.contrib.auth import authenticate, login
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAgent, IsAdmin, IsUser
 from rest_framework.response import Response
 from rest_framework import status
 from .models import WasteBot, SmartBin, Waste, User
 from .serializers import WasteBotSerializer, SmartBinSerializer, WasteSerializer, UserSerializer
-from .decorators import role_required
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import check_password
+
 
 @csrf_exempt
 @api_view(['POST'])
@@ -26,6 +27,13 @@ def user_login(request):
     if check_password(password, user.password):
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
+
+        # Add custom claims to the access token
+        refresh["first_name"] = user.first_name
+        refresh["last_name"] = user.last_name
+        refresh["email"] = user.email
+        refresh["role"] = user.role        
+
         access_token = str(refresh.access_token)
 
         return Response({
@@ -37,6 +45,7 @@ def user_login(request):
 
 #User views
 @api_view(['GET', 'POST'])
+#@permission_classes([IsUser])
 def user_list(request):
     if request.method == 'GET':
         users = User.objects.all()
@@ -154,44 +163,18 @@ def smartbin_detail(request, pk):
     
 
 # List all Waste objects or create a new Waste
-@api_view(['GET', 'POST'])
-def waste_list(request):
+@api_view(['GET'])
+def wastes_list(request):
     if request.method == 'GET':
         waste = Waste.objects.all()
         serializer = WasteSerializer(waste, many=True)
         return Response(serializer.data)
 
-    elif request.method == 'POST':
-        serializer = WasteSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 # Retrieve, update, partial update or delete a single Waste object
-@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+@api_view(['GET'])
 def waste_detail(request, pk):
     waste = get_object_or_404(Waste, pk=pk)
 
     if request.method == 'GET':
         serializer = WasteSerializer(waste)
         return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        serializer = WasteSerializer(waste, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'PATCH':
-        serializer = WasteSerializer(waste, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        waste.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
