@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     wastebot_list, wastebot_detail,
     smartbin_list, smartbin_detail,
-    user_list, user_detail, wastes_list, waste_detail
+    user_list, user_detail, wastes_list, waste_detail, waste_stream
 )
 
 urlpatterns = [
@@ -20,5 +20,6 @@ urlpatterns = [
 
     # Waste URLs
     path('wastes/', wastes_list, name='wastes-list'),
+    path('sse/wastes/', waste_stream, name='waste_stream'),
     path('wastes/<int:pk>/', waste_detail, name='waste-detail'),
 ]

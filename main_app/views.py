@@ -10,6 +10,7 @@ from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
+import asyncio
 
 
 @csrf_exempt
@@ -43,9 +44,39 @@ def user_login(request):
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
+from django.http import StreamingHttpResponse
+import json
+import time
+from asgiref.sync import sync_to_async
+
+from django.http import StreamingHttpResponse
+from asgiref.sync import sync_to_async
+import asyncio
+import json
+from .models import Waste  # Import your model
+from .serializers import WasteSerializer  # Import your serializer
+from .signals import new_waste_queue
+
+async def waste_stream(request):
+    """
+    Stream waste data to the client using Server-Sent Events (SSE).
+    """
+    async def event_stream():
+        while True:
+            # Wait for new data from the queue
+            new_waste_data = await new_waste_queue.get()
+            # Send the new data as an SSE event
+            yield f"data: {json.dumps(new_waste_data)}\n\n"
+
+    # Return the streaming response
+    response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
+    response['Cache-Control'] = 'no-cache'
+    response['Connection'] = 'keep-alive'
+    return response
+
+
 #User views
 @api_view(['GET', 'POST'])
-#@permission_classes([IsUser])
 def user_list(request):
     if request.method == 'GET':
         users = User.objects.all()
