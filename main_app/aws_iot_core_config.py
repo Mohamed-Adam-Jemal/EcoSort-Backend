@@ -3,7 +3,7 @@ import paho.mqtt.client as mqtt
 from django.conf import settings
 import threading
 import json
-from main_app.models import WasteBot, SmartBin, Waste
+from main_app.models import WasteBot, WasteBin, Waste
 
 
 # To track if the client is already subscribed
@@ -34,7 +34,7 @@ def on_message(client, userdata, message):
 
         # Retrieve instances from the database (synchronous ORM)
         wastebot_instance = WasteBot.objects.get(id=data["wastebot_id"])
-        smartbin_instance = SmartBin.objects.get(id=1)
+        smartbin_instance = WasteBin.objects.get(id=1)
 
         # Save data to the database using async function
         save_waste_data(wastebot_instance, smartbin_instance, data)

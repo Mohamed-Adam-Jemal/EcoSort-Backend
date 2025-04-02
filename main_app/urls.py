@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     wastebot_list, wastebot_detail,
-    smartbin_list, smartbin_detail,
+    wastebin_list, wastebin_detail,
     user_list, user_detail, wastes_list, waste_detail, waste_stream
 )
 
@@ -15,8 +15,8 @@ urlpatterns = [
     path('wastebots/<int:pk>/', wastebot_detail, name='wastebot-detail'),
 
     # SmartBin URLs
-    path('smartbins/', smartbin_list, name='smartbins-list'),
-    path('smartbins/<int:pk>/', smartbin_detail, name='smartbin-detail'),
+    path('smartbins/', wastebin_list, name='smartbins-list'),
+    path('smartbins/<int:pk>/', wastebin_detail, name='smartbin-detail'),
 
     # Waste URLs
     path('wastes/', wastes_list, name='wastes-list'),

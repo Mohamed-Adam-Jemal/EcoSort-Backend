@@ -4,8 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsAgent, IsAdmin, IsUser
 from rest_framework.response import Response
 from rest_framework import status
-from .models import WasteBot, SmartBin, Waste, User
-from .serializers import WasteBotSerializer, SmartBinSerializer, WasteSerializer, UserSerializer
+from .models import WasteBot, WasteBin, Waste, User
+from .serializers import WasteBotSerializer, WasteBinSerializer, WasteSerializer, UserSerializer
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -151,45 +151,45 @@ def wastebot_detail(request, pk):
         wastebot.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-# SmartBin views
+# WasteBin views
 @api_view(['GET', 'POST'])
-def smartbin_list(request):
+def wastebin_list(request):
     if request.method == 'GET':
-        smartbins = SmartBin.objects.all()
-        serializer = SmartBinSerializer(smartbins, many=True)
+        WasteBins = WasteBin.objects.all()
+        serializer = WasteBinSerializer(WasteBins, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = SmartBinSerializer(data=request.data)
+        serializer = WasteBinSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT','PATCH', 'DELETE'])
-def smartbin_detail(request, pk):
-    smartbin = get_object_or_404(SmartBin, pk=pk)
+def wastebin_detail(request, pk):
+    WasteBin = get_object_or_404(WasteBin, pk=pk)
 
     if request.method == 'GET':
-        serializer = SmartBinSerializer(smartbin)
+        serializer = WasteBinSerializer(WasteBin)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = SmartBinSerializer(smartbin, data=request.data)
+        serializer = WasteBinSerializer(WasteBin, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PATCH':
-        serializer = SmartBinSerializer(smartbin, data=request.data, partial=True)
+        serializer = WasteBinSerializer(WasteBin, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        smartbin.delete()
+        WasteBin.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
