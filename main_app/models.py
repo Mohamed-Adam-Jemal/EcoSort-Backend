@@ -43,7 +43,6 @@ class Waste(models.Model):
     def __str__(self):
         return f"Waste {self.waste_id} ({self.waste_type}) collected by WasteBot {self.wastebot.wastebot_id}"
 
-
 class WasteBin(models.Model):
 
     id = models.AutoField(primary_key=True)
