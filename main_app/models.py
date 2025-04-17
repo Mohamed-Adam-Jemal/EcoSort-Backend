@@ -6,7 +6,7 @@ class User(models.Model):
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     email = models.EmailField(max_length=50, unique=True)
-    password = models.CharField(max_length=128)  # Store hashed passwords
+    password = models.CharField(max_length=128)  
     role = models.CharField(max_length=30, default="user")
     date_joined = models.DateTimeField(auto_now_add=True)
     
@@ -15,13 +15,13 @@ class User(models.Model):
 
     def save(self, *args, **kwargs):
         # Hash the password before saving the model instance
-        if self.password and not self.password.startswith('pbkdf2_sha256$'):  # Check if the password is not already hashed
+        if self.password and not self.password.startswith('pbkdf2_sha256$'): 
             self.password = make_password(self.password)
         super().save(*args, **kwargs)
 
 class WasteBot(models.Model):
     id = models.AutoField(primary_key=True)
-    model = models.CharField(max_length=20, default='Not Specified')  # Model of the WasteBot
+    model = models.CharField(max_length=20, default='Not Specified')  
     status = models.CharField(max_length=20, default='Inactive')  # Status (Active/Inactive)
     location = models.CharField(max_length=50)  
     autonomy = models.IntegerField()  

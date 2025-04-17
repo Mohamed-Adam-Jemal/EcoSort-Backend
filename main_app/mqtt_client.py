@@ -1,7 +1,7 @@
 import paho.mqtt.client as mqtt
 import json
 from main_app.models import WasteBot, SmartBin, Waste
-from django.core.management import execute_from_command_line
+
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:

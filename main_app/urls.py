@@ -14,9 +14,9 @@ urlpatterns = [
     path('wastebots/', wastebot_list, name='wastebots-list'),
     path('wastebots/<int:pk>/', wastebot_detail, name='wastebot-detail'),
 
-    # SmartBin URLs
-    path('smartbins/', wastebin_list, name='smartbins-list'),
-    path('smartbins/<int:pk>/', wastebin_detail, name='smartbin-detail'),
+    # WasteBins URLs
+    path('wastebins/', wastebin_list, name='wastebins-list'),
+    path('wastebins/<int:pk>/', wastebin_detail, name='wastebin-detail'),
 
     # Waste URLs
     path('wastes/', wastes_list, name='wastes-list'),
