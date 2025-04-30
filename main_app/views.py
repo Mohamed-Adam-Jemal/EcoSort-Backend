@@ -10,7 +10,7 @@ from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import check_password
-
+from .aws_iot_core_config import publish_wastebot_status
 
 
 @csrf_exempt
@@ -147,6 +147,7 @@ def wastebot_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def wastebot_detail(request, pk):
     wastebot = get_object_or_404(WasteBot, pk=pk)
@@ -155,19 +156,18 @@ def wastebot_detail(request, pk):
         serializer = WasteBotSerializer(wastebot)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        serializer = WasteBotSerializer(wastebot, data=request.data)
+    elif request.method in ['PUT', 'PATCH']:
+        serializer = WasteBotSerializer(wastebot, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            
+            # Publish status change to MQTT
+            if 'status' in request.data:
+                # Convert Django model status to MQTT command
+                wastebot_status = "ON" if request.data['status'] == "Active" else "OFF"
+                publish_wastebot_status(wastebot_status)
+            
             return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'PATCH':
-        serializer = WasteBotSerializer(wastebot, data=request.data, partial=True)  # Allow partial updates
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         # Verify that the user is an admin

@@ -6,7 +6,7 @@ from main_app.models import WasteBot, SmartBin, Waste
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected to MQTT Broker")
-        client.subscribe("WasteBots/data")
+        client.subscribe("WasteBot1618/data")
 
 def on_message(client, userdata, message):
     print(f"Message received: {message.payload}")

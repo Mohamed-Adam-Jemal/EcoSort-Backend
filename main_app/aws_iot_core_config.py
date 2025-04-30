@@ -18,9 +18,9 @@ def on_connect(client, userdata, flags, rc):
 
         # Check if already subscribed to avoid double subscription
         if not is_subscribed:
-            client.subscribe(settings.MQTT_CONFIG["topic"], qos=0)
+            client.subscribe(settings.MQTT_CONFIG["data_topic"], qos=0)
             is_subscribed = True
-            print(f"Subscribed to topic: {settings.MQTT_CONFIG['topic']}")
+            print(f"Subscribed to topic: {settings.MQTT_CONFIG['data_topic']}")
     else:
         print(f"Connection failed with code {rc}")
 
@@ -53,8 +53,33 @@ def save_waste_data(wastebot_instance, smartbin_instance, data):
         smartbin=smartbin_instance
     )
 
+
+def publish_wastebot_status(status):
+    """
+    Publish ON/OFF command to WasteBot1618/status.
+    Args:
+        status (str): "ON" or "OFF"
+    """
+    if status not in ["ON", "OFF"]:
+        raise ValueError("Status must be 'ON' or 'OFF'")
+    
+    if not client:
+        raise RuntimeError("MQTT client not initialized. Call init_mqtt() first.")
+    
+     # Create JSON payload
+    payload = json.dumps({"message": status})
+
+    client.publish(
+        settings.MQTT_CONFIG["status_topic"],
+        payload,
+        qos=1,
+        retain=False
+    )
+    print(f"Published status: {status}")
+
 # Configure and run the MQTT client
 def run_mqtt_client():
+    global client
     client = mqtt.Client(userdata={"subscribed": False})  # Initialize userdata
     client.tls_set(
         ca_certs=settings.MQTT_CONFIG["root_ca_file"],
