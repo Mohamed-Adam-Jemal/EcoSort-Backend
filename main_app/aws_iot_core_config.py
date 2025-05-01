@@ -54,7 +54,7 @@ def save_waste_data(wastebot_instance, smartbin_instance, data):
     )
 
 
-def publish_wastebot_status(status):
+def publish_wastebot_status(topic, status):
     """
     Publish ON/OFF command to WasteBot1618/status.
     Args:
@@ -68,9 +68,8 @@ def publish_wastebot_status(status):
     
      # Create JSON payload
     payload = json.dumps({"message": status})
-
     client.publish(
-        settings.MQTT_CONFIG["status_topic"],
+        topic,
         payload,
         qos=1,
         retain=False

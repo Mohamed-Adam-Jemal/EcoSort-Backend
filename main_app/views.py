@@ -165,7 +165,8 @@ def wastebot_detail(request, pk):
             if 'status' in request.data:
                 # Convert Django model status to MQTT command
                 wastebot_status = "ON" if request.data['status'] == "Active" else "OFF"
-                publish_wastebot_status(wastebot_status)
+                topic = f"{wastebot.model}/status"
+                publish_wastebot_status(topic, wastebot_status)
             
             return Response(serializer.data)
 
