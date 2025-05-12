@@ -38,7 +38,7 @@ class Waste(models.Model):
     wastebot = models.ForeignKey('WasteBot', on_delete=models.CASCADE)
 
     # Foreign Key to WastetBin (one-to-many relationship)
-    WasteBin = models.ForeignKey('WasteBin', on_delete=models.SET_NULL, null=True, blank=True)
+    wastebin = models.ForeignKey('WasteBin', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"Waste {self.waste_id} ({self.waste_type}) collected by WasteBot {self.wastebot.wastebot_id}"

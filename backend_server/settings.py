@@ -103,9 +103,9 @@ MQTT_CONFIG = {
     "port": 8883,
     "data_topic": "WasteBot1618/data",
     "status_topic": "WasteBot1618/status",
-    "cert_file": r"C:\Users\eg25769\OneDrive - University of Bristol\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\2a0460b96e76de97eea25e469587e9cca3c386b8cc98fdccf1b34fe667bc1953-certificate.pem.crt",
-    "private_key_file": r"C:\Users\eg25769\OneDrive - University of Bristol\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\2a0460b96e76de97eea25e469587e9cca3c386b8cc98fdccf1b34fe667bc1953-private.pem.key",
-    "root_ca_file": r"C:\Users\eg25769\OneDrive - University of Bristol\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\AmazonRootCA1.pem",
+    "cert_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\2a0460b96e76de97eea25e469587e9cca3c386b8cc98fdccf1b34fe667bc1953-certificate.pem.crt",
+    "private_key_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\2a0460b96e76de97eea25e469587e9cca3c386b8cc98fdccf1b34fe667bc1953-private.pem.key",
+    "root_ca_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\AmazonRootCA1.pem",
 }
 
 
@@ -124,8 +124,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'EcoSort',
         'USER': 'root',
-        'PASSWORD': 'devweb25@25',
-        'HOST': '127.0.0.1',
+        'PASSWORD': 'devwebdb25@25',
+        'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"

@@ -34,10 +34,10 @@ def on_message(client, userdata, message):
 
         # Retrieve instances from the database (synchronous ORM)
         wastebot_instance = WasteBot.objects.get(id=data["wastebot_id"])
-        smartbin_instance = WasteBin.objects.get(id=1)
+        wastebin_instance = WasteBin.objects.get(id=data["wastebin_id"])
 
         # Save data to the database using async function
-        save_waste_data(wastebot_instance, smartbin_instance, data)
+        save_waste_data(wastebot_instance, wastebin_instance, data)
 
         print("Data saved to the database.")
 
@@ -46,11 +46,11 @@ def on_message(client, userdata, message):
     except Exception as e:
         print(f"Error processing message: {e}")
 
-def save_waste_data(wastebot_instance, smartbin_instance, data):
+def save_waste_data(wastebot_instance, wastebin_instance, data):
     Waste.objects.create(
         waste_type=data["detected_waste"][0]["class"],
         wastebot=wastebot_instance,
-        smartbin=smartbin_instance
+        wastebin=wastebin_instance
     )
 
 
