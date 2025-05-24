@@ -99,13 +99,13 @@ WSGI_APPLICATION = 'backend_server.wsgi.application'
 
 # MQTT Config
 MQTT_CONFIG = {
-    "iot_endpoint": "a1dbxk8rnvoutw-ats.iot.eu-north-1.amazonaws.com",
+    "iot_endpoint": "a2wfrdfqaerdf1-ats.iot.us-east-1.amazonaws.com",
     "port": 8883,
     "data_topic": "WasteBot1618/data",
     "status_topic": "WasteBot1618/status",
-    "cert_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\2a0460b96e76de97eea25e469587e9cca3c386b8cc98fdccf1b34fe667bc1953-certificate.pem.crt",
-    "private_key_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\2a0460b96e76de97eea25e469587e9cca3c386b8cc98fdccf1b34fe667bc1953-private.pem.key",
-    "root_ca_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\Backend Certif\AmazonRootCA1.pem",
+    "cert_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\WebApp IoT Cred\03ee605e5ed6582880bd5eec76900907889df87ef219bf27c7e48d494374eac4-certificate.pem.crt",
+    "private_key_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\WebApp IoT Cred\03ee605e5ed6582880bd5eec76900907889df87ef219bf27c7e48d494374eac4-private.pem.key",
+    "root_ca_file": r"C:\Users\Muham\Documents\EcoSort\Backend\EcoSort-Backend\WebApp IoT Cred\AmazonRootCA1.pem",
 }
 
 
