@@ -19,7 +19,7 @@ urlpatterns = [
     path('wastebins/<int:pk>/', wastebin_detail, name='wastebin-detail'),
 
     # Waste URLs
-    path('wastes/', wastes_list, name='wastes-list'),
-    path('sse/wastes/', waste_stream, name='waste_stream'),
-    path('wastes/<int:pk>/', waste_detail, name='waste-detail'),
+    path('waste/', wastes_list, name='wastes-list'),
+    path('sse/waste/', waste_stream, name='waste_stream'),
+    path('waste/<int:pk>/', waste_detail, name='waste-detail'),
 ]

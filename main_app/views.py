@@ -33,7 +33,7 @@ def user_login(request):
         refresh["first_name"] = user.first_name
         refresh["last_name"] = user.last_name
         refresh["email"] = user.email
-        refresh["role"] = user.role        
+        refresh["role"] = user.role
 
         access_token = str(refresh.access_token)
 
@@ -160,21 +160,20 @@ def wastebot_detail(request, pk):
         serializer = WasteBotSerializer(wastebot, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            
+
             # Publish status change to MQTT
             if 'status' in request.data:
                 # Convert Django model status to MQTT command
                 wastebot_status = "ON" if request.data['status'] == "Active" else "OFF"
                 topic = f"{wastebot.model}/status"
                 publish_wastebot_status(topic, wastebot_status)
-            
             return Response(serializer.data)
 
     elif request.method == 'DELETE':
         # Verify that the user is an admin
         wastebot.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
 # WasteBin views
 @api_view(['GET', 'POST'])
 def wastebin_list(request):
