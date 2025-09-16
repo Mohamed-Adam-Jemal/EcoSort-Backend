@@ -1,8 +1,10 @@
+import os
 import ssl
 import paho.mqtt.client as mqtt
 from django.conf import settings
 import threading
 import json
+from backend_server.settings import BASE_DIR
 from main_app.models import WasteBot, WasteBin, Waste
 
 
@@ -81,12 +83,15 @@ def run_mqtt_client():
     global client
     client = mqtt.Client(userdata={"subscribed": False})  # Initialize userdata
     client.tls_set(
-        ca_certs=settings.MQTT_CONFIG["root_ca_file"],
-        certfile=settings.MQTT_CONFIG["cert_file"],
-        keyfile=settings.MQTT_CONFIG["private_key_file"],
+        ca_certs=os.path.join(BASE_DIR, settings.MQTT_CONFIG["root_ca_file"]),
+        certfile=os.path.join(BASE_DIR, settings.MQTT_CONFIG["cert_file"]),
+        keyfile=os.path.join(BASE_DIR, settings.MQTT_CONFIG["private_key_file"]),
         cert_reqs=ssl.CERT_REQUIRED,
         tls_version=ssl.PROTOCOL_TLSv1_2
     )
+
+
+
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect(settings.MQTT_CONFIG["iot_endpoint"], settings.MQTT_CONFIG["port"])
