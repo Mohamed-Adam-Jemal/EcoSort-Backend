@@ -17,6 +17,7 @@ db.sqlite3
 media/
 
 # Virtual Environment
+virtenv/
 venv/
 env/
 ENV/
@@ -53,3 +54,6 @@ staticfiles/
 # OS
 .DS_Store
 Thumbs.db
+
+# IoT Cred
+WebApp IoT Cred/
